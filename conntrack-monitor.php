@@ -1,6 +1,6 @@
 <?php 
-include_once './App/Arguments.php';
-include_once './App/Parser.php';
+include_once __DIR__ . '/App/Arguments.php';
+include_once __DIR__ . '/App/Parser.php';
 use App\Arguments;
 use App\Parser;
 
