@@ -4,7 +4,7 @@ class Arguments{
 	private $arguments;
 	
 	public function __construct($argv){
- 		var_dump($argv);die;
+//  		var_dump($argv);die;
 	}
 	
 	public function get($name, $default){
