@@ -4,7 +4,7 @@ include_once __DIR__ . '/App/Parser.php';
 use App\Arguments;
 use App\Parser;
 
-$config = parse_ini_file('./config/settings.ini');
+$config = parse_ini_file(__DIR__ . '/config/settings.ini');
 
 $args = new Arguments($argv);
 $gcMin = $args->get("m", $config['gc_minimum']);
