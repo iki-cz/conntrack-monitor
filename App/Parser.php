@@ -1,14 +1,18 @@
 <?php 
 namespace App;
+use App\Parser\Template\IParserTemplate;
+
 class Parser{
 	private $filePath;
 	private $stats;
 	private $gcMinimum;
 	private $stream;
+	private $template;
 	
-	public function __construct(){
+	public function __construct(IParserTemplate $template){
 		$this->stats = array();
 		$this->gcMinimum = 100;
+		$this->template = $template;
 	}
 	
 	/**
