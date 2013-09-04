@@ -32,7 +32,6 @@ switch($tempSet){
 }
 
 $parser = new Parser($template);
-die("ououo");
 
 $parser->setGcMinimum($gcMin)
 	->setStream($args->getStream())
