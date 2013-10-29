@@ -34,4 +34,16 @@ class ConntrackStats{
 	public function toString(){
 		return str_pad($this->ip, 15). " " . str_pad($this->cons, 6) . " " . $this->host;
 	}
+	
+	public function getIp(){
+		return $this->ip;
+	}
+	
+	public function getConnections(){
+		return $this->cons;
+	}
+	
+	public function getHost(){
+		return $this->host;
+	}
 }
