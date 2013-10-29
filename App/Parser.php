@@ -1,16 +1,19 @@
 <?php 
 namespace App;
 use App\Parser\Template\IParserTemplate;
+use App\Parser\Stats\ConntrackStats;
+use App\Cache\FileCache;
 
 class Parser{
 	private $filePath;
+	private $rawStats;
 	private $stats;
 	private $gcMinimum;
 	private $stream;
 	private $template;
 	
 	public function __construct(IParserTemplate $template){
-		$this->stats = array();
+		$this->rawStats = array();
 		$this->gcMinimum = 100;
 		$this->template = $template;
 	}
@@ -24,7 +27,7 @@ class Parser{
 		while($line = fgets($this->getStream())){
 			$parses = $this->parseLine($line);
 			foreach ($parses as $pars){
-				$this->createStats($pars);
+				$this->createRawStats($pars);
 			}
 		}
 // 		fclose($handle);
@@ -34,20 +37,20 @@ class Parser{
 	}
 	
 	/**
-	 * sort stats 
+	 * sort rawStats 
 	 */
 	private function sort(){
-		arsort($this->stats);
+		arsort($this->rawStats);
 	}
 	
 	/**
-	 * delete stats lower than minimum
+	 * delete rawStats lower than minimum
 	 * @param integer $minimum
 	 */
 	private function collectGarbage($minimum){
-		foreach ($this->stats as $key => $stats){
-			if($stats < $minimum){
-				unset($this->stats[$key]);
+		foreach ($this->rawStats as $key => $rawStats){
+			if($rawStats < $minimum){
+				unset($this->rawStats[$key]);
 			}
 		}
 	}
@@ -68,19 +71,19 @@ class Parser{
 	}
 	
 	/**
-	 * count stats for IP 
+	 * count rawStats for IP 
 	 * @param string $ip
 	 */
-	private function createStats($ip){
-		if(isset($this->stats[$ip])){
-			$this->stats[$ip]++;
+	private function createRawStats($ip){
+		if(isset($this->rawStats[$ip])){
+			$this->rawStats[$ip]++;
 		}else{
-			$this->stats[$ip] = 1;
+			$this->rawStats[$ip] = 1;
 		}
 	}
 	
-	public function getStats(){
-		return $this->stats;
+	public function getRawStats(){
+		return $this->rawStats;
 	}
 
 	public function getFilePath()
@@ -113,6 +116,19 @@ class Parser{
 	{
 	    $this->stream = $stream;
 	    return $this;
+	}
+	
+	public function getStats(){
+		$fileCache = new FileCache();
+		
+		if(empty($this->stats)){
+			$this->stats = array();
+			foreach ($this->getRawStats() as $key => $value){
+				$this->stats[] = new ConntrackStats($key, $value, true, $fileCache);
+			}
+		}
+
+		return $this->stats;
 	}
 }
 	/*
