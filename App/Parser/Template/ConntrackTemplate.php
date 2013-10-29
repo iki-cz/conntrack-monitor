@@ -1,5 +1,8 @@
 <?php 
 namespace App\Parser\Template;
+/**
+ *
+ */
 class ConntrackTemplate extends BaseTemplate implements IParserTemplate{
 	public function setupConfig(){
 /*

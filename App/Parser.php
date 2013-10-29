@@ -4,6 +4,9 @@ use App\Parser\Template\IParserTemplate;
 use App\Parser\Stats\ConntrackStats;
 use App\Cache\FileCache;
 
+/**
+ *
+ */
 class Parser{
 	private $filePath;
 	private $rawStats;

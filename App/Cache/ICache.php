@@ -1,5 +1,8 @@
 <?php
 namespace App\Cache;
+/**
+ *
+ */
 interface ICache{
 	public function get($id);
 	public function hit($id);

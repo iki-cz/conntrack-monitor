@@ -1,4 +1,7 @@
 <?php namespace App\Cache;
+/**
+ *
+ */
 class FileCache implements ICache{
 	private $data = array();
 	private $file;

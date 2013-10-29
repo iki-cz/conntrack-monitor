@@ -3,6 +3,9 @@ namespace App\Parser\Stats;
 use App\Cache\FileCache;
 use App\Cache\ICache;
 
+/**
+ *
+ */
 class ConntrackStats{
 	private $ip;
 	private $cons;
