@@ -1,5 +1,8 @@
 <?php 
 namespace App\Parser\Template;
+use App\Parser\Template\BaseTemplate;
+use App\Parser\Template\IParserTemplate;
+
 /**
  *
  */
