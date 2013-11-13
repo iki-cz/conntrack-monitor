@@ -1,12 +1,74 @@
 <?php 
 namespace App;
 use App\Parser\Template\IParserTemplate;
+
+/**
+ *
+ */
+class Parser{
+	private $filePath;
+	private $stream;
+	private $template;
+
+	public function __construct(IParserTemplate $template){
+		$this->template = $template;
+	}
+	
+	/**
+	 * parse all lines
+	 */
+	public function parse(){
+		// 		$handle = fopen($this->filePath, "r");
+		// 		while($line = fgets($handle)){
+		while($line = fgets($this->getStream())){
+			$this->template->parse($line);
+// 			$parses = $this->parseLine($line);
+// 			foreach ($parses as $pars){
+// 				$this->createRawStats($pars);
+// 			}
+		}
+		
+		$this->template->sumarize();
+		// 		fclose($handle);
+
+// 		$this->collectGarbage($this->gcMinimum);
+// 		$this->sort();
+	}
+	
+	public function getStats(){
+		return $this->template->getStats();
+	}
+	
+	public function getStream(){
+		return $this->stream;
+	}
+
+	public function setStream($stream){
+		$this->stream = $stream;
+		return $this;
+	}
+
+// 	public function getFilePath()
+// 	{
+// 		return $this->filePath;
+// 	}
+
+// 	public function setFilePath($path){
+// 		$this->filePath = $path;
+// 		return $this;
+// 	}
+
+}
+
+/*
+namespace App;
+use App\Parser\Template\IParserTemplate;
 use App\Parser\Stats\ConntrackStats;
 use App\Cache\FileCache;
 
 /**
  *
- */
+ * /
 class Parser{
 	private $filePath;
 	private $rawStats;
@@ -23,7 +85,7 @@ class Parser{
 	
 	/**
 	 * parse all lines
-	 */
+	 * /
 	public function parse(){
 // 		$handle = fopen($this->filePath, "r");
 // 		while($line = fgets($handle)){
@@ -41,7 +103,7 @@ class Parser{
 	
 	/**
 	 * sort rawStats 
-	 */
+	 * /
 	private function sort(){
 		arsort($this->rawStats);
 	}
@@ -49,7 +111,7 @@ class Parser{
 	/**
 	 * delete rawStats lower than minimum
 	 * @param integer $minimum
-	 */
+	 * /
 	private function collectGarbage($minimum){
 		foreach ($this->rawStats as $key => $rawStats){
 			if($rawStats < $minimum){
@@ -62,7 +124,7 @@ class Parser{
 	 * get IPs from line
 	 * @param string $line
 	 * @return array matches
-	 */
+	 * /
 	private function parseLine($line){
 		$matches = array();
 		preg_match_all("/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/", $line, $matches);
@@ -76,7 +138,7 @@ class Parser{
 	/**
 	 * count rawStats for IP 
 	 * @param string $ip
-	 */
+	 * /
 	private function createRawStats($ip){
 		if(isset($this->rawStats[$ip])){
 			$this->rawStats[$ip]++;
@@ -133,7 +195,7 @@ class Parser{
 
 		return $this->stats;
 	}
-}
+}*/
 	/*
 tcp      6 114 TIME_WAIT src=85.143.161.54 dst=194.8.253.108 sport=56293 dport=22 src=194.8.253.108 dst=85.143.161.54 sport=22 dport=56293 [ASSURED] mark=0 use=1
 tcp      6 248 ESTABLISHED src=88.100.236.247 dst=194.8.253.85 sport=15599 dport=80 src=194.8.253.85 dst=88.100.236.247 sport=80 dport=15599 [ASSURED] mark=0 use=1

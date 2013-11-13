@@ -1,18 +1,54 @@
 <?php
 namespace App;
 class Arguments{
-	private $arguments;
-	
+	private $arguments = array();
+	private $map = array();
+
+	/**
+	 * nastaví výchozí mapování parametrů
+	 * všechny argumenty dá do mapy 
+	 */
 	public function __construct($argv){
-//  		var_dump($argv);die;
+		$this->map = array(
+			"m" => "minimum",
+			"min" => "minimum",
+			//"minimum" => "minimum",
+			"t" => "template",
+			//"template" => "template",
+		);
+		
+		array_shift($argv);
+		for($i = 0; $i < count($argv); $i++){
+			$this->arguments[$this->getMap(trim($argv[$i], "-"))] = $argv[$i + 1];
+			$i++;
+		}
 	}
 	
+	/**
+	 * pokud je nastaven parametr, vrátí ho, jinak default
+	 */
 	public function get($name, $default){
+		if(isset($this->arguments[$name])){
+			return $this->arguments[$name];
+		}
 		return $default;
 	}
-	
+
+	/**
+	 * 
+	 */
 	public function getStream(){
 		return fopen("php://stdin", "r");
+	}
+	
+	/**
+	 * vrací pro více identifikátorů jeden název parametru
+	 */
+	private function getMap($name){
+		if(isset($this->map[$name])){
+			return $this->map[$name];
+		}
+		return $name;
 	}
 }
 /*return "tcp      6 117 TIME_WAIT src=193.150.12.80 dst=37.157.197.240 sport=48604 dport=25 src=37.157.197.240 dst=193.150.12.80 sport=25 dport=48604 [ASSURED] mark=0 use=1

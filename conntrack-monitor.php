@@ -9,17 +9,20 @@ include_once __DIR__ . '/App/Parser/Template/ConntrackTemplate.php';
 include_once __DIR__ . '/App/Parser/Stats/ConntrackStats.php';
 include_once __DIR__ . '/App/Cache/ICache.php';
 include_once __DIR__ . '/App/Cache/FileCache.php';
+include_once __DIR__ . '/App/Color/Colors.php';
+include_once __DIR__ . '/App/Killer/ConntrackKiller.php';
 
 use App\Arguments;
 use App\Parser;
 use App\Parser\Template\IPTrafTemplate;
 use App\Parser\Template\MailLogTemplate;
 use App\Parser\Template\ConntrackTemplate;
+use App\Killer\ConntrackKiller;
 $config = parse_ini_file(__DIR__ . '/config/settings.ini');
 
 $args = new Arguments($argv);
-$gcMin = $args->get("m", $config['gc_minimum']);
-$tempSet = $args->get("t", $config['template']);
+$gcMin = $args->get("minimum", $config['gc_minimum']);
+$tempSet = $args->get("template", $config['template']);
 switch($tempSet){
 	case "iptraf":
 		$template = new IPTrafTemplate();
@@ -29,30 +32,40 @@ switch($tempSet){
 		break;
 	default:
 	case "conntrack":
-		$template = new ConntrackTemplate(); 
+		$template = new ConntrackTemplate();
+		$template->setGcMinimum($gcMin);
 		break;
 }
 
 $parser = new Parser($template);
-
-$parser->setGcMinimum($gcMin)
-	->setStream($args->getStream())
+$parser->setStream($args->getStream())
 	->parse();
 
 //var_dump($parser->getStats());
+$killer = new ConntrackKiller();
+foreach($parser->getStats() as $stat){
+	echo $stat->toString() . "\n";
+	
+	$killer->check($stat->getIp(), $stat->getConnections());
+}
+$killer->sendMailInfo();
+
+/*
+$connectionsTemplate = new ConnectionsTemplate();
+$connectionsTemplate->setGcMinimum($gcMin); 
+
+$scanPortTemplate = new ScanPortTemplate();
+
+$parser = new Parser();
+$parser->addTemplate($connectionsTemplate)
+	->addTemplate($scanPortTemplate)
+	->setStream($args->getStream())
+	->parse();
+
 foreach($parser->getStats() as $stat){
 	echo $stat->toString() . "\n";
 }
-
-
-
-
-
-
-
-
-
-
+*/
 
 
 
