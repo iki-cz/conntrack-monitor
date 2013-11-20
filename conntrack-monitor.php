@@ -23,6 +23,8 @@ $config = parse_ini_file(__DIR__ . '/config/settings.ini');
 $args = new Arguments($argv);
 $gcMin = $args->get("minimum", $config['gc_minimum']);
 $tempSet = $args->get("template", $config['template']);
+$mode = $config['mode'];
+
 switch($tempSet){
 	case "iptraf":
 		$template = new IPTrafTemplate();
@@ -43,6 +45,8 @@ $parser->setStream($args->getStream())
 
 //var_dump($parser->getStats());
 $killer = new ConntrackKiller();
+$killer->setMode($mode);
+
 foreach($parser->getStats() as $stat){
 	echo $stat->toString() . "\n";
 	

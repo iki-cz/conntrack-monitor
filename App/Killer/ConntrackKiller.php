@@ -3,6 +3,7 @@ namespace App\Killer;
 class ConntrackKiller{
 	private $log = "";
 	private $excludedSubnets = array('194.8.252.0/23','193.150.12.0/22','10.0.0.0/8');
+	private $mode;
 	
 	const LEVEL_KILL = "kill";
 	const LEVEL_WARNING = "warn";
@@ -16,7 +17,10 @@ class ConntrackKiller{
 	public function check($ip, $connections){
 		$max = $this->getMaxConnections($ip);
 
-		$connections *= 100;
+		//protože to je testovací
+		if($this->getMode() != "production"){
+			$connections *= 100;
+		}
 		
 		if($max < $connections){
 			$ll = $this->getLogLevel($ip);
@@ -25,7 +29,7 @@ class ConntrackKiller{
 				case self::LEVEL_KILL:
 					$killed = $this->kill($ip); 
 					if($killed){
-						$this->logToFile('IP '. $ip .' is AUTO DROPped' . "\n");
+						$this->logToFile('IP '. $ip .' automaticaly DROPped' . "\n");
 					}
 					$this->log .= "<br />\n" . $ip . " -> " . $connections . " | shell out, DROP: ". $killed;
 // 					echo "killing " . $ip . ", connections " . $connections . "\n";
@@ -43,10 +47,24 @@ class ConntrackKiller{
 		}
 	}
 	
+	public function getMode(){
+		return $this->mode;
+	}
+	
+	public function setMode($mode){
+		$this->mode = $mode;
+		return $this;
+	}
+	
 	/**
 	 * pokud existují nějaké záznamy v logu, pošle je mailem
 	 */
 	public function sendMailInfo(){
+		if($this->getMode() != "production"){
+			print "debug: sending info email\n";
+			return;
+		}
+		
 		if (!empty($this->log)){
 			$this->sendMail("auto-drop-ip-IGW2@best-hosting.cz","podpora@best-hosting.cz","CONNTRACK on IGW2", $this->log);
 			$this->sendMail("tmobile@best-hosting.cz","774458851@sms.t-mobile.cz","CONNTRACK on IGW2", $this->log);
@@ -59,6 +77,11 @@ class ConntrackKiller{
 	 * @return boolean|string buď true, nebo chybové hlášení
 	 */
 	public function kill($ip){
+		if($this->getMode() != "production"){
+			print "debug: banning ip " . $ip . "\n";
+			return true;
+		}
+		
 		$out = shell_exec('/opt/banip -d '. $ip);
 		if("ok" == $out){
 			return true;
@@ -71,6 +94,11 @@ class ConntrackKiller{
 	 * @param string $message
 	 */
 	private function logToFile($message){
+		if($this->getMode() != "production"){
+			print "debug: logging to file\n";
+			return;
+		}
+		
 		$f = fopen("/opt/badguys-auto.txt", "a");
 		fwrite($f, $message);
 		fclose($f);
