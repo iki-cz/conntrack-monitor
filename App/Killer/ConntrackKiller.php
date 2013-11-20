@@ -18,9 +18,9 @@ class ConntrackKiller{
 		$max = $this->getMaxConnections($ip);
 
 		//protože to je testovací
-		if($this->getMode() != "production"){
-			$connections *= 100;
-		}
+// 		if($this->getMode() != "production"){
+// 			$connections *= 100;
+// 		}
 		
 		if($max < $connections){
 			$ll = $this->getLogLevel($ip);
