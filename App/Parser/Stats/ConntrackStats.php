@@ -12,6 +12,7 @@ class ConntrackStats{
 	private $cons;
 	private $host;
 	private $destinations = array();
+	private $rating = 0;
 	
 	public function __construct($ip, $cons, $getHost = false, ICache $cache = null){
 		$id = $this->ip = $ip;
@@ -41,13 +42,26 @@ class ConntrackStats{
 		}
 	}
 	
+	public function addRating($rating){
+		$this->rating += $rating;
+		return $this;
+	}
+	
+	public function getRating(){
+		return $this->rating;
+	}
+	
 	public function toString(){
 		$c = new Colors();
 		
-		$dst = round(count($this->getDestinations()) / $this->cons * 100);
-		return 	str_pad($this->ip, 15, " ", STR_PAD_LEFT). " " . 
+// 		$dst = round(count($this->getDestinations) / $this->cons * 100);
+		//hodnocení zaokrouhli rating + počet destinací * 10 / počet konexí
+ 		$rating = round(($this->rating + count($this->destinations) * 10 ) / $this->cons);
+		return 	str_pad($this->ip, 15, " ", STR_PAD_LEFT) . " " . 
 				str_pad($this->cons, 6, " ", STR_PAD_LEFT) . " " . 
-				$c->getColoredString(str_pad($dst, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($dst)) . " " . 
+// 				$c->getColoredString(str_pad($dst, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($dst)) . " " .
+				$c->getColoredString(str_pad($rating, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($rating)) . " " .
+				str_pad($this->rating, 10, " ", STR_PAD_LEFT) . " " . 
 				$this->host;
 	}
 	

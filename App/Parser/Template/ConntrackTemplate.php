@@ -51,6 +51,34 @@ class ConntrackTemplate extends BaseTemplate implements IParserTemplate{
 				}
 			}
 		}
+		
+		//bodové ohodnocení za informace
+		$this->addRating($ip, $this->getRating($line));
+	}
+	
+	private function getRating($line){
+		$rating = 0;
+		//udp      17 5 src=193.150.12.80 dst=194.8.253.11 sport=38526 dport=53 src=194.8.253.11 dst=193.150.12.80 sport=53 dport=38526 mark=0 use=1
+		preg_match_all("/port=[0-9\.]+/", $line, $ports);
+		$ports = $ports[0];
+		foreach ($ports as $key => $port){
+			$ports[$key] = str_replace("port=", "", $port);
+		}
+		foreach ($ports as $port){
+			switch ($port){
+				case 21:
+				case 22:
+				case 25:
+					$rating += 100;
+					break;
+				case ($port <= 1024):
+					$rating += 10;
+					break;
+				default:
+					$rating += 1;
+			}
+		}
+		return $rating;
 	}
 	
 	public function sumarize(){
@@ -66,6 +94,11 @@ class ConntrackTemplate extends BaseTemplate implements IParserTemplate{
 	private function addDestination($ip, $destination){
 		$stats = $this->rawStats[$ip];
 		$stats->addDestination($destination);
+	}
+	
+	private function addRating($ip, $rating){
+		$stats = $this->rawStats[$ip];
+		$stats->addRating($rating);
 	}
 	
 // 		$fileCache = new FileCache();
