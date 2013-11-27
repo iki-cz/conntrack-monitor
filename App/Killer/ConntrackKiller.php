@@ -2,8 +2,12 @@
 namespace App\Killer;
 class ConntrackKiller{
 	private $log = "";
-	private $excludedSubnets = array('194.8.252.0/23','193.150.12.0/22','10.0.0.0/8');
 	private $mode;
+	private $connectionLimits;
+	private $defaultConnections;
+	private $subnetConnections;
+	private $mailFrom;
+	private $mailsTo;
 	
 	const LEVEL_KILL = "kill";
 	const LEVEL_WARNING = "warn";
@@ -17,11 +21,6 @@ class ConntrackKiller{
 	public function check($ip, $connections){
 		$max = $this->getMaxConnections($ip);
 
-		//protože to je testovací
-// 		if($this->getMode() != "production"){
-// 			$connections *= 100;
-// 		}
-		
 		if($max < $connections){
 			$ll = $this->getLogLevel($ip);
 
@@ -32,13 +31,9 @@ class ConntrackKiller{
 						$this->logToFile('IP '. $ip .' automaticaly DROPped' . "\n");
 					}
 					$this->log .= "<br />\n" . $ip . " -> " . $connections . " | shell out, DROP: ". $killed;
-// 					echo "killing " . $ip . ", connections " . $connections . "\n";
-					
 					break;
 				case self::LEVEL_WARNING:
 					$this->log .= "<br />\n" . $ip . " -> " . $connections . " | BH IP warning";
-// 					echo "warning " . $ip . ", connections " . $connections . "\n";
-					
 					break;
 				case self::LEVEL_NOTHING:
 				default:
@@ -47,27 +42,19 @@ class ConntrackKiller{
 		}
 	}
 	
-	public function getMode(){
-		return $this->mode;
-	}
-	
-	public function setMode($mode){
-		$this->mode = $mode;
-		return $this;
-	}
-	
 	/**
 	 * pokud existují nějaké záznamy v logu, pošle je mailem
 	 */
 	public function sendMailInfo(){
-		if($this->getMode() != "production"){
+		if($this->mode != "production"){
 			print "debug: sending info email\n";
 			return;
 		}
 		
 		if (!empty($this->log)){
-			$this->sendMail("auto-drop-ip-IGW2@best-hosting.cz","podpora@best-hosting.cz","CONNTRACK on IGW2", $this->log);
-			$this->sendMail("tmobile@best-hosting.cz","774458851@sms.t-mobile.cz","CONNTRACK on IGW2", $this->log);
+			foreach ($this->mailsTo as $receiver){
+				$this->sendMail($receiver, $this->mailFrom, "CONNTRACK on IGW2", $this->log);
+			}
 		}
 	}
 	
@@ -77,7 +64,7 @@ class ConntrackKiller{
 	 * @return boolean|string buď true, nebo chybové hlášení
 	 */
 	public function kill($ip){
-		if($this->getMode() != "production"){
+		if($this->mode != "production"){
 			print "debug: banning ip " . $ip . "\n";
 			return true;
 		}
@@ -94,7 +81,7 @@ class ConntrackKiller{
 	 * @param string $message
 	 */
 	private function logToFile($message){
-		if($this->getMode() != "production"){
+		if($this->mode != "production"){
 			print "debug: logging to file\n";
 			return;
 		}
@@ -105,22 +92,13 @@ class ConntrackKiller{
 	}
 
 	/**
-	 * array subnetů, které jsou privilegované, může se změnit na config
-	 * @return multitype:string
-	 */
-	private function getExcludedSubnets(){ 
-		// pouze warningy na nase ostatni ip ze subnetu - vetsinou je utok veden z cizich IP :-)
-		return $this->excludedSubnets;
-	}
-	
-	/**
 	 * do jaké skupiny ip adresa patří
 	 * @param string $ip
 	 * @return string
 	 */
 	private function getLogLevel($ip){
 		//ve vyhrazených subnetech se pouze varuje
-		foreach ($this->getExcludedSubnets() as $subnet){
+		foreach ($this->subnetConnections as $subnet => $limit){
 			if($this->cidrMatch($ip, $subnet)){
 				return self::LEVEL_WARNING;
 			}
@@ -135,24 +113,18 @@ class ConntrackKiller{
 	 * @return number
 	 */
 	private function getMaxConnections($ip){
-		foreach ($this->getExcludedSubnets() as $subnet){
+// 		var_dump($this->subnetConnections);die;
+		foreach ($this->subnetConnections as $subnet => $limit){
 			if($this->cidrMatch($ip, $subnet)){
-				$ip = "insubnet";
+				return $limit;
 			}
 		}
 				
-		switch ($ip){
-			case '194.8.253.85':
-			case '194.8.253.11':
-			case '194.8.253.115': 
-			case '8.8.8.8':
-			case '82.113.33.42':
-				return 500000;
-			case "insubnet":
-				return 15000;
-			default:
-				return 9000;
+		if(isset($this->connectionLimits[$ip])){
+			return 0 + $this->connectionLimits[$ip];
 		}
+		
+		return $this->defaultConnections;
 	}
 	
 	/**
@@ -162,7 +134,7 @@ class ConntrackKiller{
 	 * @return boolean
 	 */
 	private function cidrMatch($ip, $range){
-		list ($subnet, $bits) = split('/', $range);
+		list ($subnet, $bits) = explode('/', $range);
 		$ip = ip2long($ip);
 		$subnet = ip2long($subnet);
 		$mask = -1 << (32 - $bits);
@@ -184,39 +156,14 @@ class ConntrackKiller{
 		$message = "check conntrack on IGW2! ".$msg;
 		@mail($to,$subject,$message,$headers);
 	}
+	
+	public function setConfig($config){
+		$this->connectionLimits 	= $config['connections'];
+		$this->defaultConnections 	= $config['default_connections'];
+		$this->subnetConnections 	= $config['subnets'];
+		$this->mode 				= $config['mode'];
+		
+		$this->mailFrom = $config['mail_from'];
+		$this->mailsTo = $config['mail_to'];
+	}
 }
-
-
-
-
-// pouze pro kontrolu auto odpojenych IP, po overeni funkcnosti do /opt/badguys
-// 		$mailDrop=false;
-// 		$mailWarn=false;
-
-// 		foreach($parser->getStats() as $stat){
-// 			$isex = false;
-// 			foreach ($ExcludedIPs as &$exip){
-// 				if ( $exip == $stat->getIp() ){
-// 					$isex=true;
-// 				}
-// 			}
-	
-// 			$isexsub = false;
-// 			foreach ($ExcludedSubnets as &$exsub){
-// 				if(cidr_match($stat->getIp(),$exsub)){
-// 					$isexsub=true;
-// 				}
-// 			}
-	
-// 			if (!$isex && !$isexsub && $stat->getConnections() >= $ConnHaltIP){
-// 				$outSh=shell_exec('/opt/banip -d '.$stat->getIp());
-// 				if ($outSh=='ok') $this->log('IP '.$stat->getIp().' is AUTO DROP'."\n");
-// 				$mailDrop=true;
-// 				$this->log .= "<br />\n".$stat->getIp() ." -> ". $stat->getConnections() . " | shell out, DROP: ". $outSh;
-// 			}
-	
-// 			else if ( !$isex && $isexsub && $stat->getConnections() >= $ConnHaltIPBH ) {
-// 				$mailWarn=true;
-// 				$this->log .="<br />\n".$stat->getIp() ." -> ". $stat->getConnections() . " | BH IP warning";
-// 			}
-// 		}

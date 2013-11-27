@@ -45,7 +45,8 @@ $parser->setStream($args->getStream())
 
 //var_dump($parser->getStats());
 $killer = new ConntrackKiller();
-$killer->setMode($mode);
+$killer->setConfig($config);
+	
 
 foreach($parser->getStats() as $stat){
 	echo $stat->toString() . "\n";
