@@ -66,12 +66,14 @@ class ConntrackTemplate extends BaseTemplate implements IParserTemplate{
 		}
 		foreach ($ports as $port){
 			switch ($port){
-				case 21:
-				case 22:
-				case 25:
+				case 21://ftp
+				case 22://ssh
 					$rating += 100;
 					break;
-				case ($port <= 1024):
+				case 25://emaily
+					$rating += 5;
+					break;
+				case ($port <= 1024): //standardní porty
 					$rating += 10;
 					break;
 				default:
