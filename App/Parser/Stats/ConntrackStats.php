@@ -24,6 +24,21 @@ class ConntrackStats{
 		$this->cache = $cache;
 	}
 	
+	public function getValueByIndex($i){
+		switch($i){
+			case 2:
+				return count($this->getDestinations());
+				break;
+			case 3:
+				return $this->getRating();
+				break;
+			case 1:
+			default:
+				return $this->getConnections();
+				break;
+		}
+	}
+	
 	public function addDestination($dest){
 		if(isset($this->destinations[$dest])){
 			$this->destinations[$dest]++;
@@ -41,21 +56,32 @@ class ConntrackStats{
 		return $this->rating;
 	}
 	
+	public function getRelativeRatting(){
+		return round(($this->getRating() + count($this->destinations) * 10 ) / $this->getConnections());
+	}
+	
 	public function toString(){
 		$c = new Colors();
 		
 // 		$dst = round(count($this->getDestinations) / $this->cons * 100);
 		//hodnocení zaokrouhli rating + počet destinací * 10 / počet konexí
- 		$rating = round(($this->rating + count($this->destinations) * 10 ) / $this->cons);
  		
  		// IP address    connections   destinations    rank
-		return 	str_pad($this->ip, 15, " ", STR_PAD_LEFT) . " " . 
-				str_pad($this->cons, 6, " ", STR_PAD_LEFT) . " " . 
-				str_pad(count($this->destinations), 6, " ", STR_PAD_LEFT) . " " . 
-// 				$c->getColoredString(str_pad($dst, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($dst)) . " " .
-// 				$c->getColoredString(str_pad($rating, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($rating)) . " " .
-				str_pad($this->rating, 10, " ", STR_PAD_LEFT) . "   " . 
-				$this->getHost();
+				
+		$rating = $this->getRelativeRatting();
+		
+		$info = array(
+			str_pad($this->ip, 15, " ", STR_PAD_LEFT), 
+			str_pad($this->cons, 6, " ", STR_PAD_LEFT), 
+			str_pad(count($this->destinations), 6, " ", STR_PAD_LEFT), 
+			str_pad($this->rating, 10, " ", STR_PAD_LEFT),
+			$c->getColoredString(str_pad($rating, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($rating)) . " " .
+			"  ",  
+			$this->getHost()
+		);
+// 			$c->getColoredString(str_pad($dst, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($dst)) . " " .
+		
+		return implode(" ", $info); 
 	}
 	
 	public function getIp(){

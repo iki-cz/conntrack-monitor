@@ -8,6 +8,7 @@ include_once __DIR__ . '/Parser/Template/IPTrafTemplate.php';
 include_once __DIR__ . '/Parser/Template/MailLogTemplate.php';
 include_once __DIR__ . '/Parser/Template/ConntrackTemplate.php';
 include_once __DIR__ . '/Parser/Stats/ConntrackStats.php';
+include_once __DIR__ . '/Parser/Stats/StatsSorter.php';
 include_once __DIR__ . '/Cache/ICache.php';
 include_once __DIR__ . '/Cache/FileCache.php';
 include_once __DIR__ . '/Color/Colors.php';
