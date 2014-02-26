@@ -11,7 +11,9 @@ conntrack -L | php conntrack-monitor.php kill 0
 php conntrack-monitor.php alias 10.17.240.15 example-domain-alias.tld
 php conntrack-monitor.php connection 194.8.253.77 10000
 php conntrack-monitor.php subnet 194.8.253.0/24 10000
-
+php conntrack-monitor.php show connections
+php conntrack-monitor.php show subnets
+php conntrack-monitor.php show alias
 
 params:
 (m, min, minimum) => conntrack-monitor.php m 500			# 500 minimum connections for output

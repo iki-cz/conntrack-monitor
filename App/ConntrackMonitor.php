@@ -56,6 +56,9 @@ class ConntrackMonitor{
 			case "limit":
 				$out = $this->setLimit($this->config['ip'], $this->config['limit']);
 				break;
+			case "show":
+				$out = $this->show($this->config['value']);
+				break;			
 			case "conntrack":
 			default:
 				$out = $this->conntrackAction($args->getStream());
@@ -65,14 +68,34 @@ class ConntrackMonitor{
 		return $out;
 	}
 
+	private function show($what){
+		switch($what){
+			case "connection":
+			case "connections":
+				$cache = new FileCache(self::CACHE_CONNECTIONS);
+				break;
+			case "subnet":
+			case "subnets":
+				$cache = new FileCache(self::CACHE_SUBNETS);
+				break;
+			case "alias":
+			case "aliases":
+				$cache = new FileCache(self::CACHE_ALIAS);
+				break;
+			default:
+				return "empty\n";
+		}
+		$out = "";
+		foreach ($cache->getData() as $key => $value){
+			$out .= str_pad($key, 20, " ", STR_PAD_RIGHT) . " " . $value . "\n";
+		}
+		return $out . "\n";
+	}	
+	
 	private function setCacheValue($cache, $ip, $value){
 		$cache = new FileCache($cache);
 		$cache->save($ip, $value);
 		return "setting value for " . $ip . " to " . $value . "\n";
-	}
-	
-	private function setLimit($ip, $limit){
-		//TODO nontrivial setting to ini file
 	}
 	
 	/**

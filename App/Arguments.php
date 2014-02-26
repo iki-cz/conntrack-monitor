@@ -25,6 +25,7 @@ class Arguments{
 		$this->inlineArguments["subnet"] = array("ip", "value");
 		$this->inlineArguments["connection"] = array("ip", "value");
 		$this->inlineArguments["limit"] = array("ip", "value");
+		$this->inlineArguments["show"] = array("value");
 		
 		//nektere prikazy maji vice polozek za sebou
 		$argv = $this->preprocess($argv);
