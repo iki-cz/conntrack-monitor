@@ -1,0 +1,26 @@
+tcp      6 71 TIME_WAIT src=37.48.40.248 dst=194.8.253.85 sport=52569 dport=80 src=194.8.253.85 dst=37.48.40.248 sport=80 dport=52569 [ASSURED] mark=0 use=2
+tcp      6 287 ESTABLISHED src=37.48.57.3 dst=194.8.253.85 sport=53906 dport=80 src=194.8.253.85 dst=37.48.57.3 sport=80 dport=53906 [ASSURED] mark=0 use=1
+tcp      6 288 ESTABLISHED src=46.13.136.209 dst=194.8.253.85 sport=16560 dport=80 src=194.8.253.85 dst=46.13.136.209 sport=80 dport=16560 [ASSURED] mark=0 use=1
+tcp      6 202 ESTABLISHED src=37.48.38.169 dst=194.8.253.85 sport=65076 dport=80 src=194.8.253.85 dst=37.48.38.169 sport=80 dport=65076 [ASSURED] mark=0 use=1
+tcp      6 28 TIME_WAIT src=37.48.39.194 dst=194.8.253.85 sport=26246 dport=80 src=194.8.253.85 dst=37.48.39.194 sport=80 dport=26246 [ASSURED] mark=0 use=1
+tcp      6 269 ESTABLISHED src=90.177.187.89 dst=194.8.253.85 sport=45559 dport=80 src=194.8.253.85 dst=90.177.187.89 sport=80 dport=45559 [ASSURED] mark=0 use=1
+tcp      6 177 ESTABLISHED src=37.48.32.164 dst=194.8.253.85 sport=54129 dport=80 src=194.8.253.85 dst=37.48.32.164 sport=80 dport=54129 mark=0 use=1
+tcp      6 108 ESTABLISHED src=37.188.231.101 dst=194.8.253.85 sport=19818 dport=80 src=194.8.253.85 dst=37.188.231.101 sport=80 dport=19818 [ASSURED] mark=0 use=1
+tcp      6 120 ESTABLISHED src=37.48.39.63 dst=194.8.253.85 sport=40857 dport=80 src=194.8.253.85 dst=37.48.39.63 sport=80 dport=40857 [ASSURED] mark=0 use=1
+tcp      6 23 CLOSE_WAIT src=37.48.32.127 dst=194.8.253.85 sport=8219 dport=80 src=194.8.253.85 dst=37.48.32.127 sport=80 dport=8219 [ASSURED] mark=0 use=1
+tcp      6 248 ESTABLISHED src=37.188.237.43 dst=194.8.253.85 sport=7250 dport=80 src=194.8.253.85 dst=37.188.237.43 sport=80 dport=7250 [ASSURED] mark=0 use=1
+tcp      6 161 ESTABLISHED src=37.188.233.224 dst=194.8.253.85 sport=33960 dport=80 src=194.8.253.85 dst=37.188.233.224 sport=80 dport=33960 [ASSURED] mark=0 use=1
+tcp      6 111 TIME_WAIT src=78.108.97.117 dst=194.8.253.85 sport=32444 dport=80 src=194.8.253.85 dst=78.108.97.117 sport=80 dport=32444 [ASSURED] mark=0 use=1
+tcp      6 186 ESTABLISHED src=46.13.240.229 dst=194.8.253.85 sport=16723 dport=80 src=194.8.253.85 dst=46.13.240.229 sport=80 dport=16723 [ASSURED] mark=0 use=1
+tcp      6 111 ESTABLISHED src=37.188.239.171 dst=194.8.253.85 sport=23887 dport=80 src=194.8.253.85 dst=37.188.239.171 sport=80 dport=23887 [ASSURED] mark=0 use=1
+tcp      6 176 ESTABLISHED src=193.179.139.20 dst=194.8.253.85 sport=43944 dport=80 src=194.8.253.85 dst=193.179.139.20 sport=80 dport=43944 [ASSURED] mark=0 use=1
+tcp      6 149 ESTABLISHED src=89.176.90.251 dst=194.8.253.85 sport=26848 dport=80 src=194.8.253.85 dst=89.176.90.251 sport=80 dport=26848 [ASSURED] mark=0 use=1
+tcp      6 39 CLOSE_WAIT src=194.228.11.191 dst=194.8.253.85 sport=36614 dport=80 src=194.8.253.85 dst=194.228.11.191 sport=80 dport=36614 [ASSURED] mark=0 use=1
+tcp      6 21 TIME_WAIT src=37.48.39.186 dst=194.8.253.85 sport=4771 dport=80 src=194.8.253.85 dst=37.48.39.186 sport=80 dport=4771 [ASSURED] mark=0 use=1
+tcp      6 160 ESTABLISHED src=188.175.156.244 dst=194.8.253.85 sport=48929 dport=80 src=194.8.253.85 dst=188.175.156.244 sport=80 dport=48929 [ASSURED] mark=0 use=1
+tcp      6 33 CLOSE_WAIT src=109.80.76.60 dst=194.8.253.85 sport=44862 dport=80 src=194.8.253.85 dst=109.80.76.60 sport=80 dport=44862 [ASSURED] mark=0 use=2
+tcp      6 140 ESTABLISHED src=37.48.49.29 dst=194.8.253.85 sport=39593 dport=80 src=194.8.253.85 dst=37.48.49.29 sport=80 dport=39593 [ASSURED] mark=0 use=1
+tcp      6 190 ESTABLISHED src=37.188.236.229 dst=194.8.253.85 sport=57937 dport=80 src=194.8.253.85 dst=37.188.236.229 sport=80 dport=57937 [ASSURED] mark=0 use=1
+tcp      6 109 FIN_WAIT src=37.188.236.243 dst=194.8.253.85 sport=60801 dport=80 src=194.8.253.85 dst=37.188.236.243 sport=80 dport=60801 [ASSURED] mark=0 use=1
+tcp      6 146 ESTABLISHED src=37.188.233.203 dst=194.8.253.85 sport=11158 dport=80 src=194.8.253.85 dst=37.188.233.203 sport=80 dport=11158 [ASSURED] mark=0 use=1
+tcp      6 111 ESTABLISHED src=94.112.29.52 dst=194.8.253.85 sport=37568 dport=80 src=194.8.253.85 dst=94.112.29.52 sport=80 dport=37568 [ASSURED] mark=0 use=1

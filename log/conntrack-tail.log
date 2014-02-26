@@ -1,0 +1,1 @@
+udp      17 12 src=10.17.224.60 dst=194.8.253.11 sport=22 dport=53 src=194.8.253.12 dst=10.17.224.61 sport=54 dport=23 mark=0 use=1
