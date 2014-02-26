@@ -6,14 +6,18 @@ class FileCache implements ICache{
 	private $data = array();
 	private $file;
 	
-	public function __construct(){
-		$this->file = __DIR__ . "/fileCacheData.json";
+	public function __construct($file){
+		$this->file = $file;
 		if(file_exists($this->file)){
 			$content = file_get_contents($this->file);
 			if(!empty($content)){
 				$this->data = (array) json_decode($content);
 			}
 		}
+	}
+	
+	public function getData(){
+		return $this->data;
 	}
 	
 	public function save($id, $value){

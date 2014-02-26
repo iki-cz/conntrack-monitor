@@ -3,7 +3,8 @@ namespace App;
 class Arguments{
 	private $arguments = array();
 	private $map = array();
-
+	private $inlineArguments = array();
+	
 	/**
 	 * nastaví výchozí mapování parametrů
 	 * všechny argumenty dá do mapy 
@@ -12,14 +13,28 @@ class Arguments{
 		$this->map = array(
 			"m" => "minimum",
 			"min" => "minimum",
+			"k" => "kill",
 			//"minimum" => "minimum",
 			"t" => "template",
+			"c" => "connection",
+			"s" => "subnet",
 			//"template" => "template",
 		);
+
+		$this->inlineArguments["alias"] = array("ip", "value");
+		$this->inlineArguments["subnet"] = array("ip", "value");
+		$this->inlineArguments["connection"] = array("ip", "value");
+		$this->inlineArguments["limit"] = array("ip", "value");
+		
+		//nektere prikazy maji vice polozek za sebou
+		$argv = $this->preprocess($argv);
 		
 		array_shift($argv);
+		
+// 		var_dump($argv);die;
 		for($i = 0; $i < count($argv); $i++){
-			$this->arguments[$this->getMap(trim($argv[$i], "-"))] = $argv[$i + 1];
+			$id = $this->getMap(trim($argv[$i], "-"));
+			$this->arguments[$id] = $argv[$i + 1];
 			$i++;
 		}
 	}
@@ -49,6 +64,41 @@ class Arguments{
 			return $this->map[$name];
 		}
 		return $name;
+	}
+	
+	public function fill(array $what, array $to){
+// 		var_dump($this->arguments);die;
+		foreach ($what as $key => $value){
+			$to[$key] = $value;
+		}
+		return $to;
+	}
+	
+	public function getArguments(){
+		return $this->arguments;
+	}
+	
+	private function preprocess($arguments){
+		$out = array();
+		for ($i = 0; $i < count($arguments); $i++){
+			
+			if(isset($this->inlineArguments[$arguments[$i]])){
+				//když se potká některý z inline argumentů, tak nastavit "action alias param value param value"
+				$out[] = "action";
+				$out[] = $arguments[$i];
+				
+				$params = $this->inlineArguments[$arguments[$i]];
+				for($j = 0; $j < count($params); $j++){
+					$out[] = $params[$j];
+					$out[] = $arguments[++$i];
+				}
+			}else{
+				//když není v mapě, tak pouze nastavit
+				$out[] = $arguments[$i];
+			}
+		}
+//  		var_dump($out);die;
+		return $out;
 	}
 }
 /*return "tcp      6 117 TIME_WAIT src=193.150.12.80 dst=37.157.197.240 sport=48604 dport=25 src=37.157.197.240 dst=193.150.12.80 sport=25 dport=48604 [ASSURED] mark=0 use=1

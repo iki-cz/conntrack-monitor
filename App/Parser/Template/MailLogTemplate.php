@@ -1,5 +1,6 @@
 <?php 
 namespace App\Parser\Template;
+use App\Cache\ICache;
 class MailLogTemplate implements IParserTemplate{
 	public function parse($line){
 		
@@ -11,5 +12,13 @@ class MailLogTemplate implements IParserTemplate{
 	
 	public function sumarize(){
 		
+	}
+
+	public function setConfig(array $config) {
+
+	}
+
+	public function setCache(ICache $cache) {
+
 	}
 }

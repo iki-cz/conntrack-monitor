@@ -8,6 +8,7 @@ class ConntrackKiller{
 	private $subnetConnections;
 	private $mailFrom;
 	private $mailsTo;
+	private $kill;
 	
 	const LEVEL_KILL = "kill";
 	const LEVEL_WARNING = "warn";
@@ -20,13 +21,14 @@ class ConntrackKiller{
 	 */
 	public function check($ip, $connections){
 		$max = $this->getMaxConnections($ip);
-
+// 		echo "killing mode " . $this->kill . "\n";
+		
 		if($max < $connections){
 			$ll = $this->getLogLevel($ip);
 
 			switch ($ll){
 				case self::LEVEL_KILL:
-					$killed = $this->kill($ip); 
+					$killed = $this->kill($ip);
 					if($killed){
 						$this->logToFile('IP '. $ip .' automaticaly DROPped' . "\n");
 					}
@@ -46,8 +48,8 @@ class ConntrackKiller{
 	 * pokud existují nějaké záznamy v logu, pošle je mailem
 	 */
 	public function sendMailInfo(){
-		if($this->mode != "production"){
-			print "debug: sending info email\n";
+		if($this->mode != "production" && !empty($this->log)){
+			print "debug: sending info email " . $this->log . "\n";
 			return;
 		}
 		
@@ -64,6 +66,11 @@ class ConntrackKiller{
 	 * @return boolean|string buď true, nebo chybové hlášení
 	 */
 	public function kill($ip){
+		if(!$this->kill){
+			echo "no killing this time: " . $ip . "\n";
+			return;
+		}
+		
 		if($this->mode != "production"){
 			print "debug: banning ip " . $ip . "\n";
 			return true;
@@ -159,11 +166,12 @@ class ConntrackKiller{
 	
 	public function setConfig($config){
 		$this->connectionLimits 	= $config['connections'];
-		$this->defaultConnections 	= $config['default_connections'];
 		$this->subnetConnections 	= $config['subnets'];
+		$this->defaultConnections 	= $config['default_connections'];
 		$this->mode 				= $config['mode'];
 		
 		$this->mailFrom = $config['mail_from'];
 		$this->mailsTo = $config['mail_to'];
+		$this->kill = $config['kill'];
 	}
 }

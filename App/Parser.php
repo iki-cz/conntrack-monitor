@@ -1,6 +1,7 @@
 <?php 
 namespace App;
 use App\Parser\Template\IParserTemplate;
+use App\Cache\ICache;
 
 /**
  *
@@ -9,6 +10,7 @@ class Parser{
 	private $filePath;
 	private $stream;
 	private $template;
+	private $cache;
 
 	public function __construct(IParserTemplate $template){
 		$this->template = $template;
@@ -36,6 +38,7 @@ class Parser{
 	}
 	
 	public function getStats(){
+		$this->template->setCache($this->getCache());
 		return $this->template->getStats();
 	}
 	
@@ -47,7 +50,15 @@ class Parser{
 		$this->stream = $stream;
 		return $this;
 	}
-
+	
+	public function setCache(ICache $cache){
+		$this->cache = $cache;
+		return $this;
+	}
+	
+	public function getCache(){
+		return $this->cache;
+	}
 }
 /*
 tcp      6 114 TIME_WAIT src=85.143.161.54 dst=194.8.253.108 sport=56293 dport=22 src=194.8.253.108 dst=85.143.161.54 sport=22 dport=56293 [ASSURED] mark=0 use=1
