@@ -9,10 +9,11 @@ class StatsSorter{
 	}
 	
 	public function sort($i = 1){
-		self::$index = $i;
+// 		self::$index = $i;
+		$index = $i;
 		
-		$compare = function($a, $b){
-			$i = self::$index;
+		$compare = function($a, $b) use ($index){
+			$i = $index; //self::$index;
 			if($a->getValueByIndex($i) == $b->getValueByIndex($i)) return 0;
 			return $a->getValueByIndex($i) > $b->getValueByIndex($i) ? -1 : 1;
 		};
