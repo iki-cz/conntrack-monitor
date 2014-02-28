@@ -1,5 +1,5 @@
 <?php 
-include_once './App/ConntrackMonitor.php';
+include_once __DIR__ . '/App/ConntrackMonitor.php';
 use App\ConntrackMonitor;
 
 // function __autoload($class_name){
