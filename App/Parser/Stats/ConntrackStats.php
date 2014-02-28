@@ -71,13 +71,13 @@ class ConntrackStats{
 		$rating = $this->getRelativeRatting();
 		
 		$info = array(
+			str_pad($this->getHost(), 50, " ", STR_PAD_LEFT),
 			str_pad($this->ip, 15, " ", STR_PAD_LEFT), 
 			str_pad($this->cons, 6, " ", STR_PAD_LEFT), 
 			str_pad(count($this->destinations), 6, " ", STR_PAD_LEFT), 
 			str_pad($this->rating, 10, " ", STR_PAD_LEFT),
 			$c->getColoredString(str_pad($rating, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($rating)) . " " .
 			"  ",  
-			str_pad($this->getHost(), 50, " ", STR_PAD_LEFT)
 		);
 // 			$c->getColoredString(str_pad($dst, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($dst)) . " " .
 		
