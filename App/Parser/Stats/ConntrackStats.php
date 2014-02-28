@@ -77,7 +77,7 @@ class ConntrackStats{
 			str_pad($this->rating, 10, " ", STR_PAD_LEFT),
 			$c->getColoredString(str_pad($rating, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($rating)) . " " .
 			"  ",  
-			$this->getHost()
+			str_pad($this->getHost(), 50, " ", STR_PAD_LEFT)
 		);
 // 			$c->getColoredString(str_pad($dst, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($dst)) . " " .
 		
