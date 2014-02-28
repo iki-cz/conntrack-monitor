@@ -15,7 +15,7 @@ class ConntrackTemplate extends BaseTemplate implements IParserTemplate{
 	private $stats = array();
 	private $gcMinimum = 100;
 	private $cache;
-	private $getHosts = true;
+	private $gethosts = true;
 	private $sortIndex = 1;
 	
 	/**
@@ -230,7 +230,7 @@ tcp      6 12 TIME_WAIT src=125.65.245.146 dst=194.8.252.174 sport=58922 dport=2
 			$stat->addConnection();
 			$this->rawStats[$ip] = $stat;
 		}else{
-			$this->rawStats[$ip] = new ConntrackStats($ip, 1, $this->getHosts, $this->getCache());
+			$this->rawStats[$ip] = new ConntrackStats($ip, 1, $this->gethosts, $this->getCache());
 		}
 	}
 	
@@ -251,8 +251,8 @@ tcp      6 12 TIME_WAIT src=125.65.245.146 dst=194.8.252.174 sport=58922 dport=2
 	 * @see \App\Parser\Template\IParserTemplate::setConfig()
 	 */
 	public function setConfig(array $config) {
-		if(isset($config['getHosts'])){
-			$this->getHosts = ($config['getHosts']);
+		if(isset($config['gethosts'])){
+			$this->gethosts = ($config['gethosts']);
 		}
 		if(isset($config['minimum'])){
 			$this->setGcMinimum($config['minimum']);

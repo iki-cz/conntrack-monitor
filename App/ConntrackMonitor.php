@@ -26,10 +26,10 @@ use App\Cache\FileCache;
 class ConntrackMonitor{
 	private $parser;
 	private $config;
-	const CONFIG_FILE = "./config/settings.ini";
-	const CACHE_ALIAS = "./App/Cache/Data/aliases.json";
-	const CACHE_SUBNETS = "./App/Cache/Data/subnets.json";
-	const CACHE_CONNECTIONS = "./App/Cache/Data/connections.json";
+	const CONFIG_FILE = "/../config/settings.ini";
+	const CACHE_ALIAS = "/Cache/Data/aliases.json";
+	const CACHE_SUBNETS = "/Cache/Data/subnets.json";
+	const CACHE_CONNECTIONS = "/Cache/Data/connections.json";
 	
 	public function run($argv){
 		// CLI arguments 
@@ -38,20 +38,20 @@ class ConntrackMonitor{
 		$this->config = $args->fill($args->getArguments(), $this->config);
 
 		// subnets and connections config
-		$fc = new FileCache(self::CACHE_CONNECTIONS);
+		$fc = new FileCache(__DIR__ . self::CACHE_CONNECTIONS);
 		$this->config["connections"] = $fc->getData();
-		$fc = new FileCache(self::CACHE_SUBNETS);
+		$fc = new FileCache(__DIR__ . self::CACHE_SUBNETS);
 		$this->config["subnets"] = $fc->getData();
 		
 		switch ($this->config['action']){
 			case "alias":
-				$out = $this->setCacheValue(self::CACHE_ALIAS, $this->config['ip'], $this->config['value']);
+				$out = $this->setCacheValue(__DIR__ . self::CACHE_ALIAS, $this->config['ip'], $this->config['value']);
 				break;
 			case "connection":
-				$out = $this->setCacheValue(self::CACHE_CONNECTIONS, $this->config['ip'], $this->config['value']);
+				$out = $this->setCacheValue(__DIR__ . self::CACHE_CONNECTIONS, $this->config['ip'], $this->config['value']);
 				break;
 			case "subnet":
-				$out = $this->setCacheValue(self::CACHE_SUBNETS, $this->config['ip'], $this->config['value']);
+				$out = $this->setCacheValue(__DIR__ . self::CACHE_SUBNETS, $this->config['ip'], $this->config['value']);
 				break;
 			case "limit":
 				$out = $this->setLimit($this->config['ip'], $this->config['limit']);
@@ -72,15 +72,15 @@ class ConntrackMonitor{
 		switch($what){
 			case "connection":
 			case "connections":
-				$cache = new FileCache(self::CACHE_CONNECTIONS);
+				$cache = new FileCache(__DIR__ . self::CACHE_CONNECTIONS);
 				break;
 			case "subnet":
 			case "subnets":
-				$cache = new FileCache(self::CACHE_SUBNETS);
+				$cache = new FileCache(__DIR__ . self::CACHE_SUBNETS);
 				break;
 			case "alias":
 			case "aliases":
-				$cache = new FileCache(self::CACHE_ALIAS);
+				$cache = new FileCache(__DIR__ . self::CACHE_ALIAS);
 				break;
 			default:
 				return "empty\n";
@@ -103,7 +103,7 @@ class ConntrackMonitor{
 	 * @return string output
 	 */
 	private function conntrackAction($stream){
-		$cache = new FileCache(self::CACHE_ALIAS);
+		$cache = new FileCache(__DIR__ . self::CACHE_ALIAS);
 
 		$template = $this->getTemplate($this->config['template']);
 		$template->setConfig($this->config)
@@ -132,7 +132,7 @@ class ConntrackMonitor{
 	}
 	
 	private function getConfig(){
-		return parse_ini_file(self::CONFIG_FILE);
+		return parse_ini_file(__DIR__ . self::CONFIG_FILE);
 	}
 	
 	private function setConfig($config){

@@ -21,4 +21,4 @@ params:
 (connection) => conntrack-monitor.php connection 194.8.253.77 10000	# limit 10000 connections for ip
 (subnet) => conntrack-monitor.php subnet 194.8.253.0/24 10000		# limit 10000 connections for subnet
 (sort) => conntrack-monitor.php sort 2					# column for sorting
-
+(gethost) => conntrack-monitor.php gethost 0				# no host query to ip (better for cli)

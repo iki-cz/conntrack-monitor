@@ -9,7 +9,7 @@ template=conntrack
 action=conntrack
 
 ;get hosts to ips
-getHosts=true
+gethosts=true
 
 ;default sorting column
 sort=1
