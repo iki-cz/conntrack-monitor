@@ -148,6 +148,7 @@ tcp      6 12 TIME_WAIT src=125.65.245.146 dst=194.8.252.174 sport=58922 dport=2
 				$rating += 5;
 				break;
 			case ($port <= 1024): //standardní porty
+			case 5060: // SIP port?
 				$rating += 10;
 				break;
 			default:
