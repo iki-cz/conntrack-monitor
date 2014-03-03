@@ -55,7 +55,7 @@ class ConntrackKiller{
 		
 		if (!empty($this->log)){
 			foreach ($this->mailsTo as $receiver){
-				$this->sendMail($receiver, $this->mailFrom, "CONNTRACK on IGW2", $this->log);
+				$this->sendMail($this->mailFrom, $receiver, "CONNTRACK on IGW2", $this->log);
 			}
 		}
 	}
