@@ -107,7 +107,7 @@ class ConntrackKiller{
 		//ve vyhrazených subnetech se pouze varuje
 		foreach ($this->subnetConnections as $subnet => $limit){
 			if($this->cidrMatch($ip, $subnet)){
-				return self::LEVEL_WARNING;
+				return self::LEVEL_NOTHING;
 			}
 		}
 		
