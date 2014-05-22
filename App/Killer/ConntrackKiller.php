@@ -76,7 +76,7 @@ class ConntrackKiller{
 			return true;
 		}
 		
-		$out = shell_exec('/opt/banip -d '. $ip);
+		$out = shell_exec('/opt/banip-fail2ban -d '. $ip);
 		if("ok" == $out){
 			return true;
 		}
