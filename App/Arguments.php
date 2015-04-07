@@ -44,7 +44,7 @@ class Arguments{
 		//nektere prikazy maji vice polozek za sebou
 		$argv = $this->preprocess($argv);
 		
-// 		var_dump($argv);die;
+// var_dump($argv);die;
 		
 		array_shift($argv);
 		for($i = 0; $i < count($argv); $i++){

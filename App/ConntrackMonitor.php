@@ -113,8 +113,9 @@ php conntrack-monitor.php --show alias                                  # výpis
 php conntrack-monitor.php --show connection                             # výpis individuálně nastavených limitů u IP adres
 php conntrack-monitor.php --show subnet                                 # výpis subnetů s nastavením limitů
 php conntrack-monitor.php --filter 194.8.253.11 --verbose               # detailní výpis pro danou IP 
+php conntrack-monitor.php --gethost 0                                   # vypnutí zjišťování hostů z IP adres
 php conntrack-monitor.php --help                                        # zobrazení nápovědy
-		
+
 ## Aliasy ##
 --alias         -a
 --minimum       -m

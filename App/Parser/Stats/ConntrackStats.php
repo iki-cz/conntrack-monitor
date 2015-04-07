@@ -26,6 +26,8 @@ class ConntrackStats{
 		$this->getHost = $getHost;
 		$this->cache = $cache;
 		$this->config = $config;
+		
+// 		var_dump($this->getHost);die;
 	}
 	
 	public function getValueByIndex($i){
@@ -132,6 +134,7 @@ class ConntrackStats{
 	public function getHost(){
 		//má se generovat host
 		$id = $this->ip;
+// 		var_dump($this->getHost);
 		if($this->getHost){
 // 			var_dump("getting host " . $id . "\n");
 			if($this->cache instanceof ICache){
