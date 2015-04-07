@@ -13,15 +13,19 @@ class ConntrackStats{
 	private $getHost;
 	private $host;
 	private $destinations = array();
+	private $sources = array();
 	private $rating = 0;
 	private $cache;
+	private $config;
 	
-	public function __construct($ip, $cons, $getHost = false, ICache $cache = null){
-		$id = $this->ip = $ip;
+	public function __construct($ip, $cons, $getHost = false, ICache $cache = null, array $config = null){
+// 		$id = 
+		$this->ip = $ip;
 		$this->cons = $cons;
 		
 		$this->getHost = $getHost;
 		$this->cache = $cache;
+		$this->config = $config;
 	}
 	
 	public function getValueByIndex($i){
@@ -46,7 +50,15 @@ class ConntrackStats{
 			$this->destinations[$dest] = 1;
 		}
 	}
-	
+
+	public function addSource($source){
+		if(isset($this->sources[$source])){
+			$this->sources[$source]++;
+		}else{
+			$this->sources[$source] = 1;
+		}
+	}
+
 	public function addRating($rating){
 		$this->rating += $rating;
 		return $this;
@@ -74,14 +86,28 @@ class ConntrackStats{
 			str_pad($this->getHost(), 50, " ", STR_PAD_LEFT),
 			str_pad($this->ip, 15, " ", STR_PAD_LEFT), 
 			str_pad($this->cons, 6, " ", STR_PAD_LEFT), 
-			str_pad(count($this->destinations), 6, " ", STR_PAD_LEFT), 
-			str_pad($this->rating, 10, " ", STR_PAD_LEFT),
+			str_pad(count($this->destinations), 6, " ", STR_PAD_LEFT) . $c->getColoredString(">>", "light_cyan"), 
+			str_pad(count($this->sources), 6, " ", STR_PAD_LEFT) . $c->getColoredString("<<", "light_cyan"), 
+			str_pad($this->rating, 14, " ", STR_PAD_LEFT),
 			$c->getColoredString(str_pad($rating, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($rating)) . " " .
-			"  ",  
+			"  ",
 		);
 // 			$c->getColoredString(str_pad($dst, 5, " ", STR_PAD_LEFT) . "% " , $c->intToColor($dst)) . " " .
 		
-		return implode(" ", $info); 
+		$out = implode(" ", $info);
+
+		//detailní výstup pro dané IP adresy
+// var_dump($this->config);die;
+		if(isset($this->config['verbose']) && $this->config['verbose']){
+			$dest = $this->destinations;
+			arsort($dest);
+			$dest = array_slice($dest, 0, 5);
+			foreach ($dest as $key => $d){
+				$out .= PHP_EOL . str_pad($key, 66, " ", STR_PAD_LEFT) . " >> " . $d;
+			}
+		}
+
+		return $out;
 	}
 	
 	public function getIp(){

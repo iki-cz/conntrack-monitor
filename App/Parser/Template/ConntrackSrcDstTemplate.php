@@ -10,7 +10,7 @@ use App\Parser\Stats\StatsSorter;
 /**
  *
  */
-class ConntrackTemplate extends BaseTemplate implements IParserTemplate{
+class ConntrackSrcDstTemplate extends BaseTemplate implements IParserTemplate{
 	private $rawStats = array();
 	private $stats = array();
 	private $gcMinimum = 100;
@@ -27,51 +27,83 @@ class ConntrackTemplate extends BaseTemplate implements IParserTemplate{
 	public function parse($line){
 		//udp      17 26 src=194.8.253.227 dst=194.8.253.11 sport=38120 dport=53 src=194.8.253.11 dst=194.8.253.227 sport=53 dport=38120 mark=0 use=1
 		
-		//první dst a první src se parsuje, aby to dostalo nějaké informace		
-		preg_match_all("/dst=[0-9\.]+/", $line, $dsts);
-		preg_match_all("/src=[0-9\.]+/", $line, $srcs);
-		preg_match_all("/sport=[0-9\.]+/", $line, $sports);
-		preg_match_all("/dport=[0-9\.]+/", $line, $dports);
+		//první dst a první src se parsuje, aby to dostalo nějaké informace
+		$srcdsts = array();		
+		preg_match_all("/(src|dst)=[0-9\.]+/", $line, $srcdsts);
+		
+		$sdports = array();
+		preg_match_all("/(sport|dport)=[0-9]+/", $line, $sdports);
 		
 		//zbaví se divného array z preg_match_all
-		if(isset($dsts[0])){ $dsts = $dsts[0]; }
-		if(isset($srcs[0])){ $srcs = $srcs[0]; }
-		if(isset($sports[0])){ $sports = $sports[0]; }
-		if(isset($dports[0])){ $dports = $dports[0]; }
+		if(isset($srcdsts[0])){ $srcdsts = $srcdsts[0]; }
+		if(isset($sdports[0])){ $sdports = $sdports[0]; }
 		
-		$ips = array();
-		foreach ($srcs as $ip){
-			$ip = str_replace(array("src=", "dst="), "", $ip);
-			$ips[$ip] = $ip;
+		$source1 = str_replace(array("src=", "dst="), "", $srcdsts[0]);
+		$dest1 = str_replace(array("src=", "dst="), "", $srcdsts[1]);
+		$source2 = str_replace(array("src=", "dst="), "", $srcdsts[2]);
+		$dest2 = str_replace(array("src=", "dst="), "", $srcdsts[3]);
+		
+		if(!isset($sdports[3])){
+			return; // icmp     1 9 src=194.8.252.214 dst=134.170.58.123 type=8 code=0 id=12445 [UNREPLIED] src=134.170.58.123 dst=194.8.252.214 type=0 code=0 id=12445 mark=0 use=1
 		}
 		
-		foreach ($dsts as $ip){
-			$ip = str_replace(array("src=", "dst="), "", $ip);
-			$ips[$ip] = $ip;
-		}
+		$sport1 = str_replace(array("sport=", "dport="), "", $sdports[0]);
+		$dport1 = str_replace(array("sport=", "dport="), "", $sdports[1]);
+		$sport2 = str_replace(array("sport=", "dport="), "", $sdports[2]);
+		$dport2 = str_replace(array("sport=", "dport="), "", $sdports[3]);
+		
+		//udp      17 26 src=194.8.253.227 dst=194.8.253.11 sport=38120 dport=53 src=194.8.253.11 dst=194.8.253.227 sport=53 dport=38120 mark=0 use=1
+		//tcp      6 58 TIME_WAIT src=10.16.20.12 dst=208.71.186.27 sport=60653 dport=443 src=208.71.186.27 dst=194.8.252.25 sport=443 dport=60653 [ASSURED] mark=0 use=1
+		$this->createRawStats($source1);
+		$rating = $this->getRating($dport1);
+		$this->addRating($source1, $rating);
+		$this->addDestination($source1, $dest1);
+		
+		$this->createRawStats($source2);
+		$rating2 = $this->getRating($sport2);
+		$this->addRating($source2, $rating2);
+  		$this->addSource($source2, $dest2);
 
-		$ports = array();
-		foreach ($sports as $port){
-			$port = str_replace(array("sport=", "dport="), "", $port);
-			$ports[$port] = $port;
-		}
-		foreach ($dports as $port){
-			$port = str_replace(array("sport=", "dport="), "", $port);
-			$ports[$port] = $port;
-		}
+//  		$this->addDestination($source1, $dest1);
+//  		$this->addIncoming($source2, $dest2);
 		
-		$rating = 0;
-		foreach ($ports as $port){
-			$rating += $this->getRating($port);
-		}
+// 		var_dump($line);
+// 		var_dump($source1, $dest1, $source2, $dest2);
+// 		var_dump($sport1, $dport1, $sport2, $dport2);die;
 		
-		foreach ($ips as $ip){
-			$this->createRawStats($ip);
-			$this->addRating($ip, $rating);
-			$this->addDestinations($ip, $ips);
+// 		$ips = array();
+// 		foreach ($srcs as $ip){
+// 			$ip = str_replace(array("src=", "dst="), "", $ip);
+// 			$ips[$ip] = $ip;
+// 		}
+		
+// 		foreach ($dsts as $ip){
+// 			$ip = str_replace(array("src=", "dst="), "", $ip);
+// 			$ips[$ip] = $ip;
+// 		}
+
+// 		$ports = array();
+// 		foreach ($sports as $port){
+// 			$port = str_replace(array("sport=", "dport="), "", $port);
+// 			$ports[$port] = $port;
+// 		}
+// 		foreach ($dports as $port){
+// 			$port = str_replace(array("sport=", "dport="), "", $port);
+// 			$ports[$port] = $port;
+// 		}
+		
+// 		$rating = 0;
+// 		foreach ($ports as $port){
+// 			$rating += $this->getRating($port);
+// 		}
+		
+// 		foreach ($ips as $ip){
+// 			$this->createRawStats($ip);
+// 			$this->addRating($ip, $rating);
+// 			$this->addDestinations($ip, $ips);
 // 			$this->addIncoming(100);
 // 			$this->addOutgoing(50);
-		}
+// 		}
 // 		$this->addRating($src, $this->getRating($dport)); // 100 bodů
 		
 // 		var_dump($ips);
@@ -155,8 +187,9 @@ tcp      6 12 TIME_WAIT src=125.65.245.146 dst=194.8.252.174 sport=58922 dport=2
 				$rating += 5;
 				break;
 			case ($port <= 1024): //standardní porty
-			case 5060: // SIP port?
 				$rating += 10;
+			case 5060: // SIP port?
+				$rating += 25;
 				break;
 			default:
 				$rating += 1;
@@ -190,17 +223,14 @@ tcp      6 12 TIME_WAIT src=125.65.245.146 dst=194.8.252.174 sport=58922 dport=2
 		}
 	}
 	
-// 	private function addOutgoing(){
-		
-// 	}
-	
-// 	private function addIncoming(){
-// // 		$this->incoming
-// 	}
-	
 	private function addDestination($ip, $destination){
 		$stats = $this->rawStats[$ip];
 		$stats->addDestination($destination);
+	}
+
+	private function addSource($ip, $source){
+		$stats = $this->rawStats[$ip];
+		$stats->addSource($source);
 	}
 	
 	private function addRating($ip, $rating){
@@ -208,13 +238,13 @@ tcp      6 12 TIME_WAIT src=125.65.245.146 dst=194.8.252.174 sport=58922 dport=2
 		$stats->addRating($rating);
 	}
 	
-	private function parseScanPort($line){
-		if(!empty($dst) && !empty($sou)){
+// 	private function parseScanPort($line){
+// 		if(!empty($dst) && !empty($sou)){
 // 			if(isset($this->rawStats[$dst])){
 // 				$this->rawStats[$dst]["p"] = 
 // 			}
-		}
-	}
+// 		}
+// 	}
 	
 	/**
 	 * sort rawStats
@@ -246,7 +276,7 @@ tcp      6 12 TIME_WAIT src=125.65.245.146 dst=194.8.252.174 sport=58922 dport=2
 			$stat->addConnection();
 			$this->rawStats[$ip] = $stat;
 		}else{
-			$this->rawStats[$ip] = new ConntrackStats($ip, 1, $this->gethosts, $this->getCache());
+			$this->rawStats[$ip] = new ConntrackStats($ip, 1, $this->gethosts, $this->getCache(), $this->config);
 		}
 	}
 	
@@ -267,11 +297,11 @@ tcp      6 12 TIME_WAIT src=125.65.245.146 dst=194.8.252.174 sport=58922 dport=2
 	 * @see \App\Parser\Template\IParserTemplate::setConfig()
 	 */
 	public function setConfig(array $config) {
+		parent::setConfig($config);
+// 		var_dump($config);die;
 		if(isset($config['gethosts'])){
 			$this->gethosts = ($config['gethosts']);
 		}
-// 		var_dump($config);die;
-		
 		if(isset($config['minimum'])){
 			$this->setGcMinimum($config['minimum']);
 		}

@@ -5,7 +5,17 @@ namespace App\Parser\Template;
  *
  */
 abstract class BaseTemplate{
-// 	protected $config;
+	protected $config;
+
+	public function getConfig() {
+		return $this->config;
+	}
+
+	public function setConfig($config) {
+		$this->config = $config;
+		return $this;
+	}
+	
 	
 // 	const VAR_PATTERN = "pattern";
 // 	const VAR_REMOVE = "remove";

@@ -7,6 +7,8 @@ include_once __DIR__ . '/Parser/Template/IParserTemplate.php';
 include_once __DIR__ . '/Parser/Template/IPTrafTemplate.php';
 include_once __DIR__ . '/Parser/Template/MailLogTemplate.php';
 include_once __DIR__ . '/Parser/Template/ConntrackTemplate.php';
+include_once __DIR__ . '/Parser/Template/ConntrackSrcDstTemplate.php';
+include_once __DIR__ . '/Parser/Template/PacketsTemplate.php';
 include_once __DIR__ . '/Parser/Stats/ConntrackStats.php';
 include_once __DIR__ . '/Parser/Stats/StatsSorter.php';
 include_once __DIR__ . '/Cache/ICache.php';
@@ -22,6 +24,8 @@ use App\Parser\Template\MailLogTemplate;
 use App\Parser\Template\ConntrackTemplate;
 use App\Killer\ConntrackKiller;
 use App\Cache\FileCache;
+use App\Parser\Template\PacketsTemplate;
+use App\Parser\Template\ConntrackSrcDstTemplate;
 
 class ConntrackMonitor{
 	private $parser;
@@ -42,7 +46,7 @@ class ConntrackMonitor{
 		$this->config["connections"] = $fc->getData();
 		$fc = new FileCache(__DIR__ . self::CACHE_SUBNETS);
 		$this->config["subnets"] = $fc->getData();
-		
+// 	var_dump($this->config['action']);die;
 		switch ($this->config['action']){
 			case "alias":
 				$out = $this->setCacheValue(__DIR__ . self::CACHE_ALIAS, $this->config['ip'], $this->config['value']);
@@ -58,6 +62,9 @@ class ConntrackMonitor{
 				break;
 			case "show":
 				$out = $this->show($this->config['value']);
+				break;			
+			case "help":
+				$out = $this->help();
 				break;			
 			case "conntrack":
 			default:
@@ -90,7 +97,35 @@ class ConntrackMonitor{
 			$out .= str_pad($key, 20, " ", STR_PAD_RIGHT) . " " . $value . "\n";
 		}
 		return $out . "\n";
-	}	
+	}
+	
+	private function help(){
+		return <<<HELP
+## Parametry ##
+--minimum 500           # změna limitu pro výpis položek 
+--verbose               # podrobný výstup
+--filter 194.8.253.11   # omezení výpisu pouze na danou IP
+			
+## Ukázky ## 
+php conntrack-monitor.php --connection 194.8.253.11 15000               # nastavení idividuálního limitu IP adresy
+php conntrack-monitor.php --alias 194.8.253.11 orfeus.best-hosting.cz   # pojmenování IP adresy
+php conntrack-monitor.php --show alias                                  # výpis seznamu aliasů 
+php conntrack-monitor.php --show connection                             # výpis individuálně nastavených limitů u IP adres
+php conntrack-monitor.php --show subnet                                 # výpis subnetů s nastavením limitů
+php conntrack-monitor.php --filter 194.8.253.11 --verbose               # detailní výpis pro danou IP 
+php conntrack-monitor.php --help                                        # zobrazení nápovědy
+		
+## Aliasy ##
+--alias         -a
+--minimum       -m
+--verbose       -v
+--kill          -k
+--template      -t
+--connection    -c
+--filter        -f
+
+HELP;
+	}
 	
 	private function setCacheValue($cache, $ip, $value){
 		$cache = new FileCache($cache);
@@ -112,16 +147,25 @@ class ConntrackMonitor{
 		$this->parser = new Parser($template);
 		$this->parser->setStream($stream)
 			->setCache($cache)
+// 			->setConfig($this->config)
 			->parse();
 		
 		//var_dump($parser->getStats());
 		$killer = new ConntrackKiller();
 		$killer->setConfig($this->config);
 		
-		$out = "";
+		$out = "-------------------------------------------address------connections---[count, IPs out, IPs in]---score-[count, %]\n";
 		foreach($this->parser->getStats() as $stat){
-			$out .= $stat->toString() . "\n";
-			$killer->check($stat->getIp(), $stat->getConnections());
+			//když je zapnutý filter, tak pouze některé hodnoty
+			if(isset($this->config['filter'])){
+				if($this->config['filter'] == $stat->getIp()){
+					$out .= $stat->toString() . "\n";
+					$killer->check($stat->getIp(), $stat->getConnections());
+				}
+			}else{
+				$out .= $stat->toString() . "\n";
+				$killer->check($stat->getIp(), $stat->getConnections());
+			}
 		}
 		$killer->sendMailInfo();
 		return $out;
@@ -147,9 +191,16 @@ class ConntrackMonitor{
 			case "maillog":
 				$template = new MailLogTemplate();
 				break;
+			case "packets":
+				$template = new PacketsTemplate();
+				break;
 			default:
 			case "conntrack":
 				$template = new ConntrackTemplate();
+// 				$template->setGcMinimum($gcMin);
+				break;
+			case "conntrackSrcDst":
+				$template = new ConntrackSrcDstTemplate();
 // 				$template->setGcMinimum($gcMin);
 				break;
 		}

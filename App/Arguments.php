@@ -4,6 +4,7 @@ class Arguments{
 	private $arguments = array();
 	private $map = array();
 	private $inlineArguments = array();
+	private $singleArguments = array();
 	
 	/**
 	 * nastaví výchozí mapování parametrů
@@ -11,33 +12,48 @@ class Arguments{
 	 */
 	public function __construct($argv){
 		$this->map = array(
-			"m" => "minimum",
-			"min" => "minimum",
-			"k" => "kill",
+			"-m" => "--minimum",
+			"-min" => "--minimum",
+			"-k" => "--kill",
 			//"minimum" => "minimum",
-			"t" => "template",
-			"c" => "connection",
-			"s" => "subnet",
+			"-t" => "--template",
+			"-c" => "--connection",
+			"-s" => "--subnet",
+			"-v" => "--verbose",
+			"-f" => "--filter",
+			"-i" => "--ip",
+			"-a" => "--alias",
+			"-h" => "--help",
 			//"template" => "template",
 		);
 
-		$this->inlineArguments["alias"] = array("ip", "value");
-		$this->inlineArguments["subnet"] = array("ip", "value");
-		$this->inlineArguments["connection"] = array("ip", "value");
-		$this->inlineArguments["limit"] = array("ip", "value");
-		$this->inlineArguments["show"] = array("value");
+		$this->inlineArguments["--alias"] = array("ip", "value");
+		$this->inlineArguments["--subnet"] = array("ip", "value");
+		$this->inlineArguments["--connection"] = array("ip", "value");
+		$this->inlineArguments["--limit"] = array("ip", "value");
+// 		$this->inlineArguments["--filter"] = array("ip"); // nemůže tu být, protože se z toho pak dělá action
+		$this->inlineArguments["--show"] = array("value");
+		$this->inlineArguments["--help"] = array();
+		
+		$this->singleArguments = array(
+// 			"-v" => true,
+			"--verbose" => true,
+// 			"--filter" => true, //filter má přímo IP adresu
+		);
 		
 		//nektere prikazy maji vice polozek za sebou
 		$argv = $this->preprocess($argv);
 		
-		array_shift($argv);
-		
 // 		var_dump($argv);die;
+		
+		array_shift($argv);
 		for($i = 0; $i < count($argv); $i++){
-			$id = $this->getMap(trim($argv[$i], "-"));
-			$this->arguments[$id] = $argv[$i + 1];
+// 			$id = $this->getMap($argv[$i]); //vyhledává "m" (původně "-m") v argumentech 
+// 			$id = $this->getMap(trim($argv[$i], "-")); //vyhledává "m" (původně "-m") v argumentech 
+			$this->arguments[trim($argv[$i], "-")] = $argv[$i + 1]; //z "--minimum" udělá "minimum"
 			$i++;
 		}
+// 		var_dump($this->arguments);die;
 	}
 	
 	/**
@@ -70,7 +86,7 @@ class Arguments{
 	public function fill(array $what, array $to){
 // 		var_dump($this->arguments);die;
 		foreach ($what as $key => $value){
-			$to[$key] = $value;
+			$to[$key] = $value; 
 		}
 		return $to;
 	}
@@ -80,22 +96,46 @@ class Arguments{
 	}
 	
 	private function preprocess($arguments){
+// 		$out = array();
+// 		for ($i = 0; $i < count($arguments); $i++){
+// 			//výchozí nastavení je pro všechny parametry true
+// 			if(strpos($arguments[$i], "-") === 0){
+// 				$out[trim($arguments[$i], "-")] = true;
+// 			}else{
+				
+// 			}
+// 		}		
+		
+// 		var_dump($arguments); die();
+
 		$out = array();
 		for ($i = 0; $i < count($arguments); $i++){
+// 			var_dump($arguments[$i]);
+			$arg = $this->getMap($arguments[$i]);
 			
-			if(isset($this->inlineArguments[$arguments[$i]])){
+			if(isset($this->inlineArguments[$arg])){
 				//když se potká některý z inline argumentů, tak nastavit "action alias param value param value"
 				$out[] = "action";
-				$out[] = $arguments[$i];
+				$out[] = trim($arg, "-"); //z "--alias" udělá "alias"
 				
-				$params = $this->inlineArguments[$arguments[$i]];
+				$params = $this->inlineArguments[$arg];
 				for($j = 0; $j < count($params); $j++){
 					$out[] = $params[$j];
 					$out[] = $arguments[++$i];
 				}
+			}elseif(isset($this->singleArguments[$arg])){
+				$out[] = $arg;
+				$out[] = $this->singleArguments[$arg];
 			}else{
 				//když není v mapě, tak pouze nastavit
-				$out[] = $arguments[$i];
+// 				var_dump($arguments[$i]);
+				$out[] = $arg;
+
+// 				if(in_array($arguments[$i], $this->singleArguments)){
+// // 					var_dump(array($arguments[$i]));
+// // 					die();
+// 					$out[] = $this->singleArguments[$arguments[$i]];
+// 				}
 			}
 		}
 //  		var_dump($out);die;
