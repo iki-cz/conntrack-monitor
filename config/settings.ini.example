@@ -21,6 +21,6 @@ mode=production
 default_connections = 2500
 kill=false
 
-mail_from = "podpora@best-hosting.cz"
-mail_to[] = "774458851@sms.t-mobile.cz"
-mail_to[] = "auto-drop-ip-IGW2@best-hosting.cz"
+mail_from = "my@email.com"
+mail_to[] = "example@email-adderss.com"
+mail_to[] = "example2@email-addresss.com"
