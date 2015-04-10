@@ -11,7 +11,7 @@ abstract class BaseTemplate{
 		return $this->config;
 	}
 
-	public function setConfig($config) {
+	public function setConfig(array $config) {
 		$this->config = $config;
 		return $this;
 	}
