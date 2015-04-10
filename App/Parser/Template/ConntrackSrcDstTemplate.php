@@ -38,6 +38,11 @@ class ConntrackSrcDstTemplate extends BaseTemplate implements IParserTemplate{
 		if(isset($srcdsts[0])){ $srcdsts = $srcdsts[0]; }
 		if(isset($sdports[0])){ $sdports = $sdports[0]; }
 		
+		if(!isset($srcdsts[0])){
+			var_dump("bad line " . $line);
+			return;
+		}
+		
 		$source1 = str_replace(array("src=", "dst="), "", $srcdsts[0]);
 		$dest1 = str_replace(array("src=", "dst="), "", $srcdsts[1]);
 		$source2 = str_replace(array("src=", "dst="), "", $srcdsts[2]);
